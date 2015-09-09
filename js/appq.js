@@ -41,15 +41,22 @@ taskInput.on("keypress", function (e) {
         AddTaskFunc();
     }
 });
+var keyEventPress = function (x) {
+    var parent = $(this).parent();
+    if (x.keyCode == 13) {
+        parent.find("label").text(parent.find("input[type=text]").val());
+        parent.removeClass("editMode");
+    }
 
+};
 var bindTaskEvent = function (taskListItem, checkBoxEventHandler) {
     $(taskListItem).off();
     $(taskListItem).on("change", "input[type=checkbox]", checkBoxEventHandler);
     $(taskListItem).on("click", "button.edit", function (e) {
-        console.log("Edit");
         var parent = $(this).parent();
         e.stopPropagation();
         if (!parent.hasClass("editMode")) {
+            parent.on("keyup", "input[type=text]", keyEventPress);
             parent.find("input[type=text]").val(parent.find("label").text());
         } else {
             parent.find("label").text(parent.find("input[type=text]").val());
