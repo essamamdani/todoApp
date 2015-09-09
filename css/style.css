@@ -107,15 +107,18 @@ li > .delete:hover {
 #completed-tasks label {
     text-decoration: line-through;
     color: #888;
+    width:296px;
 }
 #completed-tasks label span {
-    color: darkblue;
+    color: dodgerblue;
     float: right;
-    font-size: 12px;
-    line-height: 3.6em;
+    font-size: 10px;
+    line-height: 4.2em;
+    font-style: italic;
+
 }
 #completed-tasks .edit {
-    visibility: hidden;
+    display: none;
 }
 
 /* Edit Task */

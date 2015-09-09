@@ -3,47 +3,69 @@ var inCompleteList = $("#incomplete-tasks"),
     addButton = $("#add-task"),
     taskInput = $("#new-task");
 
-addButton.on("click", function () {
-    if(taskInput.val().length > 0){
+var AddTaskFunc = function () {
+    if (taskInput.val().length > 0) {
         $(".message").text("");
         var listItem = $('<li><input type="checkbox"><label>' + taskInput.val() + '</label><input type="text"><button class="edit">Edit</button><button class="delete">Delete</button></li>');
         $(inCompleteList).append(listItem);
+        taskInput.val("");
         bindTaskEvent(listItem, completeTask);
     } else {
         $(".message").text("Please Type Some Text");
     }
+};
+var inCompleteTask = function () {
+    var listItem = $(this).parent();
+    inCompleteList.append(listItem);
+    listItem.find("label span").remove();
+    bindTaskEvent(listItem, completeTask);
+    bindTaskEvent(listItem, completeTask);
+};
+var completeTask = function () {
+    var listItem = $(this).parent();
+    if (listItem.hasClass("editMode")) {
+        listItem.removeClass("editMode");
+    }
+    CompleteList.append(listItem);
+    var d = new Date();
+    var timestamp = d.getDate() + "-" + d.getMonth() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+    listItem.find("label").append("<span>" + timestamp + "</span>");
+
+    bindTaskEvent(listItem, inCompleteTask);
+};
+
+
+addButton.on("click", AddTaskFunc);
+taskInput.on("keypress", function (e) {
+    if (e.keyCode === 13) {
+        AddTaskFunc();
+    }
 });
 
 var bindTaskEvent = function (taskListItem, checkBoxEventHandler) {
-    $(taskListItem).find("input[type=checkbox]").on("change", checkBoxEventHandler);
-
-    $(taskListItem).find("button.edit").on("click", function () {
+    $(taskListItem).off();
+    $(taskListItem).on("change", "input[type=checkbox]", checkBoxEventHandler);
+    $(taskListItem).on("click", "button.edit", function (e) {
+        console.log("Edit");
         var parent = $(this).parent();
-        if (parent.parent().is("#incomplete-tasks")) {
+        e.stopPropagation();
+        if (!parent.hasClass("editMode")) {
             parent.find("input[type=text]").val(parent.find("label").text());
-            parent.toggleClass("editMode");
+        } else {
+            parent.find("label").text(parent.find("input[type=text]").val());
         }
+        parent.toggleClass("editMode");
+        parent.find("input[type=text]").focus();
+
     });
-    $(taskListItem).find("button.delete").on("click", function () {
+    $(taskListItem).on("click", "button.delete", function () {
         if (confirm("Are you sure?")) {
             $(this).parent().remove();
         }
     });
 };
 
-var completeTask = function () {
-    var listItem = $(this).parent();
-    CompleteList.append(listItem);
-    var d = new Date();
-    var timestamp = d.getDate() + "-" + d.getMonth() + "-" + d.getFullYear() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-    listItem.find("label").append("<span>"+timestamp+"</span>");
-    bindTaskEvent(listItem, inCompleteTask);
-};
-var inCompleteTask = function () {
-    var listItem = $(this).parent();
-    inCompleteList.append(listItem);
-    bindTaskEvent(listItem, completeTask);
-};
+
 $(CompleteList).each(function (i, v) {
     bindTaskEvent(v, inCompleteTask);
 });
